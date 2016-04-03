@@ -34,7 +34,7 @@ public class DataSendService extends IntentService{
     protected BufferedSocket socket = null;
     protected InetAddress _ip;
 //    public static final String _hubproto_supports = "NoGetINFO UserIP2 MiniSlots TTH";
-    public static final String _hubproto_supports = "UserCommand UserIP2 TTHSearch ZPipe0 GetZBlock";
+    public static final String _hubproto_supports = "UserCommand NoHello UserIP2 TTHSearch UGetBlock";
     protected String _botname="1234", _password=" ", _description, _conn_type ="1A", _email =_botname+"@sdslabs.co.in", _sharesize ="5368709120", _hubname;
     private String _hubSupports = "";
     protected static final String _protoVersion = "1.0091";
@@ -144,6 +144,7 @@ public class DataSendService extends IntentService{
 
         sendMyINFO();
         String nicklist = ReadCommand();
+        Log.d("NickList: ",nicklist);
         Log.e("AftersendInfo", ReadCommand());
         Log.e("AftersendInfo2", ReadCommand());
         Log.e("AftersendInfo2", ReadCommand());

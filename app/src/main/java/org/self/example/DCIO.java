@@ -6,6 +6,7 @@ package org.self.example;
 import android.util.Log;
 
 import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -34,6 +35,24 @@ class DCIO {
      * @return Command from hub
      * @throws IOException
      */
+    final String ReadCommand3(InputStream in) throws IOException{
+        byte[] resultBuff = new byte[0];
+        byte[] buff = new byte[1024];
+        int MaxIter=5;
+        int k = -1;
+        while((k = in.read(buff, 0, buff.length)) != -1 && MaxIter>0) {
+            byte[] tbuff = new byte[resultBuff.length + k]; // temp buffer size = bytes already read + bytes last read
+            System.arraycopy(resultBuff, 0, tbuff, 0, resultBuff.length); // copy previous bytes
+            System.arraycopy(buff, 0, tbuff, resultBuff.length, k);  // copy current lot
+            resultBuff = tbuff; // call the temp buffer as your result buff
+            MaxIter--;
+            Log.d("MaxIter: ",MaxIter+"");
+        }
+        System.out.println(resultBuff.length + " bytes read.");
+        Log.d("Readcommand3:",new String(resultBuff,"UTF-8")+"");
+        return new String(resultBuff, "UTF-8");
+    }
+
     final String ReadCommand(InputStream in) throws IOException {
         int c;
         //Changing to StringBuffer from String. Artifact#2934462.
