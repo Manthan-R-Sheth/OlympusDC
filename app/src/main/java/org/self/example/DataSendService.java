@@ -11,6 +11,10 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by manthan on 1/4/16.
@@ -33,6 +37,7 @@ public class DataSendService extends IntentService{
     private String _hubHostname;
     protected BufferedSocket socket = null;
     protected InetAddress _ip;
+
 //    public static final String _hubproto_supports = "NoGetINFO UserIP2 MiniSlots TTH";
     public static final String _hubproto_supports = "UserCommand NoHello UserIP2 TTHSearch UGetBlock";
     protected String _botname="1234", _password=" ", _description, _conn_type ="1A", _email =_botname+"@sdslabs.co.in", _sharesize ="5368709120", _hubname;
@@ -143,13 +148,15 @@ public class DataSendService extends IntentService{
         //Log.e("AfterNickList", ReadCommand());
 
         sendMyINFO();
-        String nicklist = ReadCommand();
-        Log.d("NickList: ",nicklist);
-        Log.e("AftersendInfo", ReadCommand());
-        Log.e("AftersendInfo2", ReadCommand());
-        Log.e("AftersendInfo2", ReadCommand());
-        Log.e("AftersendInfo2", ReadCommand());
-        Log.e("AftersendInfo2", ReadCommand());
+        dcio.ReadCommand4(input);
+        //Log.d("NickList: ",nicklist);
+        //setUserMap(nicklist);
+        DisplayUser();
+//        Log.e("AftersendInfo", ReadCommand());
+//        Log.e("AftersendInfo2", ReadCommand());
+//        Log.e("AftersendInfo2", ReadCommand());
+//        Log.e("AftersendInfo2", ReadCommand());
+//        Log.e("AftersendInfo2", ReadCommand());
 
 
     }
@@ -157,6 +164,28 @@ public class DataSendService extends IntentService{
         String buffer = "$MyINFO $ALL " + _botname + " <++ V:0.2,M:A,H:0/1/0,S:5>" + "$ $" +
                 _conn_type + "$" + _email + "$" + _sharesize + "$|";
         SendCommand(buffer);
+    }
+
+//    private void setUserMap(String data){
+//        String[] commands=data.split("|");
+//        for (String response:commands){
+//            if(response=="") continue;
+//            else if(response.startsWith("$MyINFO $ALL")){
+//                 String[] temp=response.split(" ");
+//                if(temp[2]!="PtokaX"){
+//                    UserMap.put(temp[2],temp[3]);
+//                }
+//            }
+//        }
+//    }
+
+    public void DisplayUser(){
+        Set keys=dcio.UserMap.keySet();
+        Iterator it=dcio.UserMap.entrySet().iterator();
+        while(it.hasNext()){
+            Map.Entry pair=(Map.Entry)it.next();
+            Log.d("User Display:",(String)pair.getKey()+":"+(String)pair.getValue());
+        }
     }
 
     private final String lock2key(String lock) {

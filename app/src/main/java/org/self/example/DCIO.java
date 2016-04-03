@@ -3,14 +3,19 @@ package org.self.example;
 /**
  * Created by manthan on 30/3/16.
  */
+import android.renderscript.ScriptGroup;
 import android.util.Log;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created on 26-May-08<br>
@@ -23,7 +28,7 @@ import java.net.Socket;
  */
 class DCIO {
     private String ioexception_msg;
-
+    Map<String,String> UserMap=new HashMap<>();
     void set_IOExceptionMsg(String msg) {
         ioexception_msg = msg;
     }
@@ -31,28 +36,73 @@ class DCIO {
     /**
      * Reading raw command from <i>in</i>.
      *
-     * @param input stream from which to read the command.
+     * @param in from which to read the command.
      * @return Command from hub
      * @throws IOException
      */
-    final String ReadCommand3(InputStream in) throws IOException{
-        byte[] resultBuff = new byte[0];
-        byte[] buff = new byte[1024];
-        int MaxIter=5;
-        int k = -1;
-        while((k = in.read(buff, 0, buff.length)) != -1 && MaxIter>0) {
-            byte[] tbuff = new byte[resultBuff.length + k]; // temp buffer size = bytes already read + bytes last read
-            System.arraycopy(resultBuff, 0, tbuff, 0, resultBuff.length); // copy previous bytes
-            System.arraycopy(buff, 0, tbuff, resultBuff.length, k);  // copy current lot
-            resultBuff = tbuff; // call the temp buffer as your result buff
-            MaxIter--;
-            Log.d("MaxIter: ",MaxIter+"");
+//    final String ReadCommand3(InputStream in) throws IOException{
+//        byte[] resultBuff = new byte[0];
+//        byte[] buff = new byte[409600];
+//        int MaxIter=10;
+//        int k = -1;
+//        while((k = in.read(buff, 0, buff.length)) != -1 && MaxIter>0) {
+//            byte[] tbuff = new byte[resultBuff.length + k]; // temp buffer size = bytes already read + bytes last read
+//            System.arraycopy(resultBuff, 0, tbuff, 0, resultBuff.length); // copy previous bytes
+//            System.arraycopy(buff, 0, tbuff, resultBuff.length, k);  // copy current lot
+//            resultBuff = tbuff; // call the temp buffer as your result buff
+//            MaxIter--;
+//            Log.d("MaxIter: ",MaxIter+"");
+//        }
+//        System.out.println(resultBuff.length + " bytes read.");
+//        Log.d("Readcommand3:",new String(resultBuff,"UTF-8")+"");
+//        return new String(resultBuff, "UTF-8");
+//    }
+    final String ReadCommand2(InputStream in) throws IOException{
+        int users=50;
+        StringBuilder sb=new StringBuilder();
+        for(int i=0;i<=users;i++){
+            sb.append(ReadCommand(in));
+            Log.d("ReadCommand4:",i+"");
         }
-        System.out.println(resultBuff.length + " bytes read.");
-        Log.d("Readcommand3:",new String(resultBuff,"UTF-8")+"");
-        return new String(resultBuff, "UTF-8");
+        return sb.toString();
     }
 
+    final void ReadCommand4(InputStream in) throws IOException{
+        int users=0;
+        String param="";
+        int loc=0;
+        do{
+            param=ReadCommand(in);
+            Log.d("Sentence:",param.indexOf("Users:")+"");
+        }while(param.indexOf("Users:")<0);
+        loc=param.indexOf("Users:");
+
+        users=Integer.parseInt(param.substring(loc+7).split("\\)")[0]);
+        Log.d("Users:",users+"");
+        StringBuilder sb=new StringBuilder();
+        for(int i=0;i<=users;i++){
+            //sb.append(ReadCommand(in));
+            SetUserMap(ReadCommand(in));
+            Log.d("ReadCommand4:",i+"");
+        }
+        //return sb.toString();
+    }
+
+    final void SetUserMap(String response){
+        if(response=="") {}
+        else if(response.startsWith("$MyINFO $ALL")){
+            String[] temp=response.split(" ");
+            String info="";
+            for(int i=3;i<temp.length;i++){
+                info+=temp[i];
+            }
+            if(temp[2]!="PtokaX"){
+                //Log.d("value:",temp[3]);
+                int length=info.length();
+                UserMap.put(temp[2],info.substring(0,length-1));
+            }
+        }
+    }
     final String ReadCommand(InputStream in) throws IOException {
         int c;
         //Changing to StringBuffer from String. Artifact#2934462.
