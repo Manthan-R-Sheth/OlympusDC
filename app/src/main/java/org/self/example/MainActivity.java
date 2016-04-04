@@ -11,22 +11,20 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.util.HashMap;
+
 public class MainActivity extends AppCompatActivity {
     Button submit;
     EditText lock;
     DataReceiver receiver;
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(receiver);
-    }
+    HashMap<String,String> usersonline;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         uisetup();
+        usersonline=new HashMap<>();
         IntentFilter filter = new IntentFilter(DataReceiver.ACTION_RESP);
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         receiver = new DataReceiver();
@@ -51,7 +49,9 @@ public class MainActivity extends AppCompatActivity {
                 "com.example.intent.action.MESSAGE_PROCESSED";
         @Override
         public void onReceive(Context context, Intent intent) {
-        lock.setText(intent.getStringExtra(DataSendService.PARAM_OUT_MSG));
+            usersonline=(HashMap<String,String>)intent.getSerializableExtra(DataSendService.PARAM_OUT_MSG);
+
+
         }
     }
 

@@ -38,7 +38,7 @@ public class DataSendService extends IntentService{
     protected BufferedSocket socket = null;
     protected InetAddress _ip;
 
-//    public static final String _hubproto_supports = "NoGetINFO UserIP2 MiniSlots TTH";
+    //Hub proto supports lists all supports needed to the hub
     public static final String _hubproto_supports = "UserCommand NoHello UserIP2 TTHSearch UGetBlock";
     protected String _botname="1234", _password=" ", _description, _conn_type ="1A", _email =_botname+"@sdslabs.co.in", _sharesize ="5368709120", _hubname;
     private String _hubSupports = "";
@@ -58,7 +58,7 @@ public class DataSendService extends IntentService{
             Intent broadcast=new Intent();
             broadcast.addCategory(Intent.CATEGORY_DEFAULT);
             broadcast.setAction(MainActivity.DataReceiver.ACTION_RESP);
-            broadcast.putExtra(PARAM_OUT_MSG,key);
+            broadcast.putExtra(PARAM_OUT_MSG,dcio.UserMap);
             sendBroadcast(broadcast);
         } catch (IOException e) {
             Log.e("IOEceptiom", e.getMessage());
@@ -141,23 +141,14 @@ public class DataSendService extends IntentService{
 
         buffer = "$Version " + _protoVersion + "|";
         SendCommand(buffer);
-       /// Log.e("AfterVersion", ReadCommand());
 
         buffer = "$GetNickList|";
         SendCommand(buffer);
-        //Log.e("AfterNickList", ReadCommand());
 
         sendMyINFO();
         dcio.ReadCommand4(input);
-        //Log.d("NickList: ",nicklist);
-        //setUserMap(nicklist);
-        DisplayUser();
-//        Log.e("AftersendInfo", ReadCommand());
-//        Log.e("AftersendInfo2", ReadCommand());
-//        Log.e("AftersendInfo2", ReadCommand());
-//        Log.e("AftersendInfo2", ReadCommand());
-//        Log.e("AftersendInfo2", ReadCommand());
 
+        DisplayUser();
 
     }
     synchronized protected void sendMyINFO() throws IOException {
@@ -165,19 +156,6 @@ public class DataSendService extends IntentService{
                 _conn_type + "$" + _email + "$" + _sharesize + "$|";
         SendCommand(buffer);
     }
-
-//    private void setUserMap(String data){
-//        String[] commands=data.split("|");
-//        for (String response:commands){
-//            if(response=="") continue;
-//            else if(response.startsWith("$MyINFO $ALL")){
-//                 String[] temp=response.split(" ");
-//                if(temp[2]!="PtokaX"){
-//                    UserMap.put(temp[2],temp[3]);
-//                }
-//            }
-//        }
-//    }
 
     public void DisplayUser(){
         Set keys=dcio.UserMap.keySet();
@@ -236,5 +214,9 @@ public class DataSendService extends IntentService{
         user = rawCommand.substring(1, rawCommand.indexOf('>'));
         message = rawCommand.substring(rawCommand.indexOf('>'));
         message = message.substring(2, message.length() - 1);
+    }
+
+    private void connectToPeer(){
+
     }
 }
