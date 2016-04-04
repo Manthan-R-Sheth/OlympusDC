@@ -10,6 +10,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -27,24 +29,23 @@ public class DataSendService extends IntentService{
      */
 
     DCIO dcio;
-    Socket sock;
-    String lockFromDC="",response,initial_command_for_connection="";
-    BufferedReader sin = null;
-    PrintWriter sout=null;
     private int _port;
     InputStream input;
     OutputStream output;
     private String _hubHostname;
-    protected BufferedSocket socket = null;
+    protected BufferedSocket socket = null,peersocket=null;
+    private ServerSocket peersocketServer=null;
     protected InetAddress _ip;
 
     //Hub proto supports lists all supports needed to the hub
     public static final String _hubproto_supports = "UserCommand NoHello UserIP2 TTHSearch UGetBlock";
-    protected String _botname="1234", _password=" ", _description, _conn_type ="1A", _email =_botname+"@sdslabs.co.in", _sharesize ="5368709120", _hubname;
+    protected String _botname="1234", _password=" ", _conn_type ="1A", _email =_botname+"@sdslabs.co.in", _sharesize ="5368709120", _hubname;
     private String _hubSupports = "";
     protected static final String _protoVersion = "1.0091";
     public static String PARAM_OUT_MSG;
     String key;
+    private OutputStream outputPeer;
+    private InputStream inputPeer;
 
     public DataSendService(){
         super("DataSendService");
@@ -55,6 +56,7 @@ public class DataSendService extends IntentService{
     protected void onHandleIntent(Intent intent) {
         try {
             connect("dc.sdslabs.co.in", 411);
+            connectToPeer("Gru");
             Intent broadcast=new Intent();
             broadcast.addCategory(Intent.CATEGORY_DEFAULT);
             broadcast.setAction(MainActivity.DataReceiver.ACTION_RESP);
@@ -64,6 +66,32 @@ public class DataSendService extends IntentService{
             Log.e("IOEceptiom", e.getMessage());
         }
     }
+
+    private void connectToPeer(String nick) throws IOException {
+        try {
+            String buffer;
+            peersocket=new BufferedSocket();
+            peersocketServer = new ServerSocket();
+            peersocketServer.bind(new InetSocketAddress(" ", 0));
+            peersocket.setKeepAlive(true);
+
+            buffer = "$ConnectToMe " + nick + "0.0.0.0:" + peersocketServer.getLocalPort();
+            SendCommand(buffer);
+//            peersocket=(BufferedSocket)peersocketServer.accept();
+//            inputPeer=peersocket.getInputStream();
+//            outputPeer=peersocket.getOutputStream();
+//            buffer = ReadCommandPeer();
+            Log.e("Peer", buffer);
+        }
+        catch (Exception e){
+            Log.e("exp in peer",e.getMessage());
+        }
+    }
+
+    private String ReadCommandPeer() throws IOException {
+        return dcio.ReadCommand(inputPeer);
+    }
+
 
     private void connect(String hostname, int port)throws IOException,BotException{
 
@@ -216,7 +244,5 @@ public class DataSendService extends IntentService{
         message = message.substring(2, message.length() - 1);
     }
 
-    private void connectToPeer(){
 
-    }
 }

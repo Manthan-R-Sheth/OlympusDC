@@ -14,7 +14,7 @@ import android.widget.EditText;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
-    Button submit;
+    Button submit,peer;
     EditText lock;
     DataReceiver receiver;
     HashMap<String,String> usersonline;
@@ -33,8 +33,16 @@ public class MainActivity extends AppCompatActivity {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent datasend=new Intent(MainActivity.this,DataSendService.class);
+                Intent datasend = new Intent(MainActivity.this, DataSendService.class);
                 startService(datasend);
+            }
+        });
+
+        peer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                Intent peeronnect= new Intent(MainActivity.this,PeerConnect.class);
+//                startService(peeronnect);
             }
         });
     }
@@ -42,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private void uisetup() {
         submit=(Button)findViewById(R.id.Submit);
         lock=(EditText)findViewById(R.id.edit1);
+        peer=(Button)findViewById(R.id.Peer);
     }
 
     public class DataReceiver extends BroadcastReceiver{
@@ -50,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             usersonline=(HashMap<String,String>)intent.getSerializableExtra(DataSendService.PARAM_OUT_MSG);
-
 
         }
     }
